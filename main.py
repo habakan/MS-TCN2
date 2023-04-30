@@ -1,5 +1,3 @@
-#!/usr/bin/python2.7
-
 import torch
 from model import Trainer
 from batch_gen import BatchGenerator
@@ -21,6 +19,7 @@ parser.add_argument('--dataset', default="gtea")
 parser.add_argument('--split', default='1')
 
 parser.add_argument('--features_dim', default='2048', type=int)
+prser.add_argument('--features_dir_name', default='features')
 parser.add_argument('--bz', default='1', type=int)
 parser.add_argument('--lr', default='0.0005', type=float)
 
@@ -54,7 +53,7 @@ if args.dataset == "50salads":
 
 vid_list_file = "./data/"+args.dataset+"/splits/train.split"+args.split+".bundle"
 vid_list_file_tst = "./data/"+args.dataset+"/splits/test.split"+args.split+".bundle"
-features_path = "./data/"+args.dataset+"/features/"
+Tures_path = "./data/"+args.dataset+"/"+args.features_dir_name+"/"
 gt_path = "./data/"+args.dataset+"/groundTruth/"
 
 mapping_file = "./data/"+args.dataset+"/mapping.txt"

@@ -1,6 +1,4 @@
-#!/usr/bin/python2.7
 # adapted from: https://github.com/colincsl/TemporalConvolutionalNetworks/blob/master/code/metrics.py
-
 import numpy as np
 import argparse
 
@@ -131,8 +129,8 @@ def main():
             fp[s] += fp1
             fn[s] += fn1
 
-    print("Acc: %.4f" % (100*float(correct)/total))
-    print('Edit: %.4f' % ((1.0*edit)/len(list_of_videos)))
+    print(("Acc: %.4f" % (100*float(correct)/total)))
+    print(('Edit: %.4f' % ((1.0*edit)/len(list_of_videos))))
     acc = (100*float(correct)/total)
     edit = ((1.0*edit)/len(list_of_videos))
     for s in range(len(overlap)):
@@ -142,7 +140,7 @@ def main():
         f1 = 2.0 * (precision*recall) / (precision+recall)
 
         f1 = np.nan_to_num(f1)*100
-        print('F1@%0.2f: %.4f' % (overlap[s], f1))
+        print(('F1@%0.2f: %.4f' % (overlap[s], f1)))
 
 if __name__ == '__main__':
     main()
