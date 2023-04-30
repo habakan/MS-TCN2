@@ -19,7 +19,7 @@ parser.add_argument('--dataset', default="gtea")
 parser.add_argument('--split', default='1')
 
 parser.add_argument('--features_dim', default='2048', type=int)
-prser.add_argument('--features_dir_name', default='features')
+parser.add_argument('--features_dir_name', default='features')
 parser.add_argument('--bz', default='1', type=int)
 parser.add_argument('--lr', default='0.0005', type=float)
 
