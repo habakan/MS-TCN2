@@ -53,7 +53,7 @@ if args.dataset == "50salads":
 
 vid_list_file = "./data/"+args.dataset+"/splits/train.split"+args.split+".bundle"
 vid_list_file_tst = "./data/"+args.dataset+"/splits/test.split"+args.split+".bundle"
-Tures_path = "./data/"+args.dataset+"/"+args.features_dir_name+"/"
+features_path = "./data/"+args.dataset+"/"+args.features_dir_name+"/"
 gt_path = "./data/"+args.dataset+"/groundTruth/"
 
 mapping_file = "./data/"+args.dataset+"/mapping.txt"
