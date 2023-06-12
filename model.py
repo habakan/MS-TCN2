@@ -166,11 +166,14 @@ class Trainer:
             logger.info("[epoch %d]: epoch loss = %f,   acc = %f" % (epoch + 1, epoch_loss / len(batch_gen.list_of_examples),
                                                                float(correct)/total))
 
-    def predict(self, model_dir, results_dir, features_path, vid_list_file, epoch, actions_dict, device, sample_rate):
+    def predict(self, model_dir, results_dir, features_path, vid_list_file, epoch, actions_dict, device, sample_rate, is_best=False):
         self.model.eval()
         with torch.no_grad():
             self.model.to(device)
-            self.model.load_state_dict(torch.load(model_dir + "/epoch-" + str(epoch) + ".model"))
+            if is_best:
+                self.model.load_state_dict(torch.load(model_dir + "/best.model"))
+            else:
+                self.model.load_state_dict(torch.load(model_dir + "/epoch-" + str(epoch) + ".model"))
             file_ptr = open(vid_list_file, 'r')
             list_of_vids = file_ptr.read().split('\n')[:-1]
             file_ptr.close()
@@ -193,3 +196,5 @@ class Trainer:
                 f_ptr.write(' '.join(recognition))
                 f_ptr.close()
 
+                predictions = predictions.to('cpu').detach().numpy().copy()
+                np.save(results_dir + "/" + f_name + ".npy", predictions)

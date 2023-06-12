@@ -17,6 +17,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--action', default='train')
 parser.add_argument('--dataset', default="gtea")
 parser.add_argument('--split', default='1')
+parser.add_argument('--best_model', action='store_true')
 
 parser.add_argument('--features_dim', default='2048', type=int)
 parser.add_argument('--features_dir_name', default='features')
@@ -81,5 +82,5 @@ if args.action == "train":
     trainer.train(model_dir, batch_gen, num_epochs=num_epochs, batch_size=bz, learning_rate=lr, device=device)
 
 if args.action == "predict":
-    trainer.predict(model_dir, results_dir, features_path, vid_list_file_tst, num_epochs, actions_dict, device, sample_rate)
+    trainer.predict(model_dir, results_dir, features_path, vid_list_file_tst, num_epochs, actions_dict, device, sample_rate, is_best=args.best_model)
 

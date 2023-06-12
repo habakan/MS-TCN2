@@ -1,7 +1,10 @@
+#!/usr/bin/python2.7
 # adapted from: https://github.com/colincsl/TemporalConvolutionalNetworks/blob/master/code/metrics.py
+
 import numpy as np
 import argparse
-
+import csv
+import pathlib
 
 def read_file(path):
     with open(path, 'r') as f:
@@ -27,12 +30,12 @@ def get_labels_start_end_time(frame_wise_labels, bg_class=["background"]):
                 ends.append(i)
             last_label = frame_wise_labels[i]
     if last_label not in bg_class:
-        ends.append(i)
+        ends.append(i + 1)
     return labels, starts, ends
 
 
 def levenstein(p, y, norm=False):
-    m_row = len(p)
+    m_row = len(p)    
     n_col = len(y)
     D = np.zeros([m_row+1, n_col+1], np.float)
     for i in range(m_row+1):
@@ -48,7 +51,7 @@ def levenstein(p, y, norm=False):
                 D[i, j] = min(D[i-1, j] + 1,
                               D[i, j-1] + 1,
                               D[i-1, j-1] + 1)
-
+    
     if norm:
         score = (1 - D[-1, -1]/max(m_row, n_col)) * 100
     else:
@@ -93,8 +96,15 @@ def main():
 
     parser.add_argument('--dataset', default="gtea")
     parser.add_argument('--split', default='1')
+    parser.add_argument('--feature_name', default='features')
+    parser.add_argument('--config', default='./configs/example.yaml')
+    parser.add_argument('--exclude_category_list', default=[], nargs="*", type=str)
 
     args = parser.parse_args()
+
+    exclude_category_list = args.exclude_category_list
+
+    output_path = pathlib.Path('/work/results/'+'ms-tcn2_' + args.dataset+'.csv')
 
     ground_truth_path = "./data/"+args.dataset+"/groundTruth/"
     recog_path = "./results/"+args.dataset+"/split_"+args.split+"/"
@@ -112,15 +122,15 @@ def main():
     for vid in list_of_videos:
         gt_file = ground_truth_path + vid
         gt_content = read_file(gt_file).split('\n')[0:-1]
-
+        
         recog_file = recog_path + vid.split('.')[0]
         recog_content = read_file(recog_file).split('\n')[1].split()
 
         for i in range(len(gt_content)):
             total += 1
-            if gt_content[i] == recog_content[i]:
+            if gt_content[i] == recog_content[i] and gt_content[i] not in exclude_category_list:
                 correct += 1
-
+        
         edit += edit_score(recog_content, gt_content)
 
         for s in range(len(overlap)):
@@ -128,19 +138,31 @@ def main():
             tp[s] += tp1
             fp[s] += fp1
             fn[s] += fn1
+            
+    acc = 100*float(correct)/total
+    edit = (1.0*edit)/len(list_of_videos)
 
-    print(("Acc: %.4f" % (100*float(correct)/total)))
-    print(('Edit: %.4f' % ((1.0*edit)/len(list_of_videos))))
-    acc = (100*float(correct)/total)
-    edit = ((1.0*edit)/len(list_of_videos))
+    print("Acc: %.4f" % (acc))
+    print('Edit: %.4f' % (edit))
+
+    f1_list = []
+
     for s in range(len(overlap)):
         precision = tp[s] / float(tp[s]+fp[s])
         recall = tp[s] / float(tp[s]+fn[s])
-
+    
         f1 = 2.0 * (precision*recall) / (precision+recall)
 
         f1 = np.nan_to_num(f1)*100
-        print(('F1@%0.2f: %.4f' % (overlap[s], f1)))
+        print('F1@%0.2f: %.4f' % (overlap[s], f1))
+        f1_list.append(f1)
+
+    with output_path.open('a') as csvfile:
+        evalwriter = csv.writer(csvfile, delimiter=',')
+        if not output_path.exists():
+            evalwriter.writerow(['config_path', 'feature_name', 'fold', 'Acc', 'Edit', 'F1@10%', 'F1@25%', 'F1@50%'])
+        evalwriter.writerow([args.config, args.feature_name, args.split, acc, edit] + f1_list)
+
 
 if __name__ == '__main__':
     main()
