@@ -165,6 +165,10 @@ class Trainer:
             torch.save(optimizer.state_dict(), save_dir + "/epoch-" + str(epoch + 1) + ".opt")
             logger.info("[epoch %d]: epoch loss = %f,   acc = %f" % (epoch + 1, epoch_loss / len(batch_gen.list_of_examples),
                                                                float(correct)/total))
+            if epoch_loss / len(batch_gen.list_of_examples) < best_loss:
+                best_loss = epoch_loss / len(batch_gen.list_of_examples)
+                torch.save(self.model.state_dict(), save_dir + "/best.model")
+                torch.save(optimizer.state_dict(), save_dir + "/best.opt")
 
     def predict(self, model_dir, results_dir, features_path, vid_list_file, epoch, actions_dict, device, sample_rate, is_best=False):
         self.model.eval()
