@@ -137,6 +137,7 @@ class Trainer:
         self.model.train()
         self.model.to(device)
         optimizer = optim.Adam(self.model.parameters(), lr=learning_rate)
+        best_loss = 100.0
         for epoch in range(num_epochs):
             epoch_loss = 0
             correct = 0
